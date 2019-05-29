@@ -5,6 +5,8 @@ import os
 import glob
 import skimage.io as io
 import skimage.transform as trans
+import itertools
+import pudb
 
 Sky = [128,128,128]
 Building = [128,0,0]
@@ -103,15 +105,21 @@ def trainGenerator(batch_size,train_path,image_folder,mask_folder,aug_dict,image
 
 def testGenerator(test_path, test_images_list,target_size = (256,256),flag_multi_class = False,as_gray = True):
     for img_path_name in test_images_list:
-        # pu.db
         # img = io.imread(os.path.join(test_path,"%d.png"%i),as_gray = as_gray)
-        img = io.imread(img_path_name ,as_gray = as_gray)
+        img = io.imread(img_path_name, as_gray=as_gray)
+
         img = img / 255
         img = trans.resize(img,target_size)
         # TODO
         # img = np.reshape(img,img.shape+(1,)) if (not flag_multi_class) else img
         img = np.reshape(img,(1,)+img.shape)
-        yield img
+
+
+        img_rgb = io.imread(img_path_name)
+        img_rgb = trans.resize(img_rgb, target_size)
+        io.imsave(os.path.join('output', os.path.basename(img_path_name)), img_rgb)
+
+        yield img, img_path_name
 
 
 def geneTrainNpy(image_path,mask_path,flag_multi_class = False,num_class = 2,image_prefix = "image",mask_prefix = "mask",image_as_gray = True,mask_as_gray = True):
@@ -139,7 +147,15 @@ def labelVisualize(num_class,color_dict,img):
     return img_out / 255
 
 
-def saveResult(save_path,npyfile,flag_multi_class = False,num_class = 2):
+def saveResult(save_path,npyfile, test_gen_img_name, flag_multi_class = False,num_class = 2):
     for i,item in enumerate(npyfile):
+        img_name = next(test_gen_img_name)
+        img_name = os.path.basename(img_name).split('.')[0] + '_predict.png'
         img = labelVisualize(num_class,COLOR_DICT,item) if flag_multi_class else item[:,:,0]
-        io.imsave(os.path.join(save_path,"%d_predict.png"%i),img)
+        io.imsave(os.path.join(save_path, img_name), img)
+        # io.imsave(os.path.join(save_path,"%d_predict.png"%i),img)
+
+
+def split_gen(gen):
+    gen_a, gen_b = itertools.tee(gen, 2)
+    return (a for a, b in gen_a), (b for a, b in gen_b)
