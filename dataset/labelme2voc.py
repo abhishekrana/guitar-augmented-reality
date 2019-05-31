@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+# https://github.com/wkentaro/labelme/tree/master/examples/semantic_segmentation
+
 from __future__ import print_function
 
 import argparse

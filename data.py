@@ -1,5 +1,10 @@
 from __future__ import print_function
+import keras
 from keras.preprocessing.image import ImageDataGenerator
+from keras.preprocessing.image import load_img
+from keras.preprocessing.image import img_to_array
+from keras.preprocessing.image import array_to_img
+from PIL import Image
 import numpy as np 
 import os
 import glob
@@ -7,6 +12,9 @@ import skimage.io as io
 import skimage.transform as trans
 import itertools
 import pudb
+import logging
+import Augmentor
+import random
 
 Sky = [128,128,128]
 Building = [128,0,0]
@@ -26,7 +34,6 @@ COLOR_DICT = np.array([Sky, Building, Pole, Road, Pavement,
 
 
 def adjustData(img,mask,flag_multi_class,num_class):
-    # pu.db
     if(flag_multi_class):
         img = img / 255
         mask[mask == 38.0] = 1
@@ -43,10 +50,10 @@ def adjustData(img,mask,flag_multi_class,num_class):
         ## new_mask = np.reshape(new_mask,(new_mask.shape[0],new_mask.shape[1]*new_mask.shape[2],new_mask.shape[3])) if flag_multi_class else np.reshape(new_mask,(new_mask.shape[0]*new_mask.shape[1],new_mask.shape[2]))
         #mask = new_mask
     elif(np.max(img) > 1):
-        # pu.db
         img = img / 255
         # Hardcoding
         # mask = mask /255
+        print('mask', np.unique(mask, return_counts=True))
         mask[mask == 38.0] = 1
 
         # import sys
@@ -56,6 +63,85 @@ def adjustData(img,mask,flag_multi_class,num_class):
         # mask[mask <= 0.5] = 0
     return (img,mask)
 
+
+def trainGenerator2(batch_size,train_path,image_folder,mask_folder,aug_dict,image_color_mode = "grayscale",
+                    mask_color_mode = "grayscale",image_save_prefix  = "image",mask_save_prefix  = "mask",
+                    flag_multi_class = False,num_class = 2,save_to_dir = None,target_size = (256,256),seed = 1,
+                    class_mode=None, shuffle=False
+                    ):
+ 
+    # images_dir = os.path.join(train_path, image_folder)
+    # labels_dir = os.path.join(train_path, mask_folder)
+    # logging.debug('images_dir {}'.format(images_dir))
+    # logging.debug('labels_dir {}'.format(labels_dir))
+
+    images_list = glob.glob(os.path.join(train_path, image_folder, '*' + '.jpg'))
+    # labels = glob.glob(os.path.join(images_dir, 'label', '*' + '.png'))
+
+    # images = []
+    # labels = []
+    # for image_path in images_list:
+    #     image = load_img(image_path) # target_size= # PIL
+    #     x = img_to_array(image)
+    #     images.append(x)
+
+    #     label_path = os.path.join(train_path, mask_folder, os.path.basename(image_path).split('.')[0] + '.png')
+    #     label = load_img(label_path) # target_size=
+    #     y = img_to_array(label)
+    #     labels.append(y)
+
+
+        # labels.append([os.path.join(train_path, mask_folder, os.path.basename(image_path).split('.')[0] + '.png')])
+
+    labels_list = []
+    for image_path in images_list:
+        labels_list.append(os.path.join(train_path, mask_folder, os.path.basename(image_path).split('.')[0] + '.png'))
+
+    images = [np.asarray(Image.open(x)) for x in images_list]
+    labels = [np.asarray(Image.open(x)) for x in labels_list]
+
+    # images = np.array(images)
+    # labels = np.array(labels)
+
+    p = Augmentor.DataPipeline(images, labels)
+    # p.rotate(1, max_left_rotation=5, max_right_rotation=5)
+    # p.flip_top_bottom(0.5)
+    p.zoom_random(1, percentage_area=0.5)
+
+    # TODO: Batch size should be always 1
+    img, mask = p.sample(1)
+    # g = p.keras_generator(batch_size=1)
+
+    img = np.array(img)
+    mask = np.array(mask)
+
+    img = np.squeeze(img)
+    mask = np.squeeze(mask)
+
+    img, mask = adjustData(img,mask,flag_multi_class,num_class)
+    hash_str = str(random.getrandbits(16))
+
+    pu.db
+    img_rgb = Image.fromarray((img * 255).astype(np.uint8))
+    img_rgb.save(os.path.join('output', 'aug', 'img-' + hash_str + '.jpg'))
+
+    img_gs = Image.fromarray((mask * 255).astype(np.uint8))
+    img_gs.save(os.path.join('output', 'aug', 'mask-' + hash_str + '.jpg'))
+
+    # yield (img, mask)
+
+    ### images, labels = next(g)
+    # for img, mask in g:
+    #     img, mask = adjustData(img,mask,flag_multi_class,num_class)
+
+    #     hash_srt = str(random.getrandbits(16))
+    #     img_rgb = Image.fromarray((img * 255).astype(numpy.uint8))
+    #     img_rbg.save(os.path.join('output', 'aug', 'aug_image-' + hash_str + '.jpg'))
+
+
+        # yield (img, mask)
+
+    return None
 
 
 def trainGenerator(batch_size,train_path,image_folder,mask_folder,aug_dict,image_color_mode = "grayscale",

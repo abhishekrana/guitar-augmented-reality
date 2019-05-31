@@ -3,10 +3,16 @@
 
 
 # rm -rf output/*
-python3 data_aug_offline.py
+# python3 data_aug_offline.py
+# cp -r output/aug/images/* data/guitar/dataset_frames1_train_aug/image/
+# cp -r output/aug/mask/* data/guitar/dataset_frames1_train_aug/label/
+# cp -r output/aug/images/* data/guitar/dataset_frames1_val_aug/image/
+# cp -r output/aug/mask/* data/guitar/dataset_frames1_val_aug/label/
 
-# rm -rf output/*
-# python3 main.py
+
+
+rm -rf output/*
+python3 main.py
 # cp -r data/guitar/dataset_frames1_train/* output/
 # cp -r data/guitar/test/* output/
 

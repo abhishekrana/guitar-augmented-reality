@@ -49,8 +49,12 @@ if __name__ == '__main__':
     # train_data_dir = 'data/guitar/dataset_frames1_train_1'
     # val_data_dir = 'data/guitar/dataset_frames1_val_1'
 
-    train_data_dir = 'data/guitar/dataset_frames1_train'
-    val_data_dir = 'data/guitar/dataset_frames1_val'
+    # train_data_dir = 'data/guitar/dataset_frames1_train'
+    # val_data_dir = 'data/guitar/dataset_frames1_val'
+
+    train_data_dir = 'data/guitar/dataset_frames1_train_aug'
+    val_data_dir = 'data/guitar/dataset_frames1_val_aug'
+
 
     # os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
@@ -73,13 +77,16 @@ if __name__ == '__main__':
     flag_multi_class = False
     num_channels = 3
     # batch_size = 2
-    batch_size = 1
+    batch_size = 8
     epochs = 100
     # epochs = 1
     # target_size = (256, 256)
     # target_size = (420, 1280)
     # target_size = (416, 1280)
-    target_size = (720, 1280)
+
+    # target_size = (720, 1280)
+    # target_size = (360, 640)
+    target_size = (640, 640)
     num_classes = 2
     
     if save_to_dir:
@@ -157,7 +164,8 @@ if __name__ == '__main__':
 
         history = model.fit_generator(
                 train_gen, 
-                steps_per_epoch=num_train_images//batch_size,
+                # steps_per_epoch=num_train_images//batch_size,
+                steps_per_epoch=200,
                 epochs=epochs,
                 callbacks=[model_checkpoint],
                 # callbacks=[model_checkpoint, tensorboard_cb]
@@ -179,12 +187,13 @@ if __name__ == '__main__':
         input_size = (target_size[0], target_size[1], num_channels)
         logging.debug('input_size {}'.format(input_size))
         model = UNet(
-               pretrained_weights='output/checkpoints/model_weights.hdf5',
+               # pretrained_weights='output/checkpoints/model_weights.hdf5',
                # pretrained_weights='output1/checkpoints/model_weights.hdf5',
                # pretrained_weights='output_6_model1/checkpoints/model_weights.hdf5',
                # pretrained_weights='output/checkpoints/model_weights.hdf5',
                # pretrained_weights='output_7_model2-val_acc_0.9928-val_loss_0.0493/checkpoints/model_weights.hdf5',
                # pretrained_weights='output_8_wrong/checkpoints/model_weights.hdf5',
+               # pretrained_weights='output_10_model3_aug/checkpoints/model_weights.hdf5',
                input_size=input_size,
                num_classes = num_classes
                )
