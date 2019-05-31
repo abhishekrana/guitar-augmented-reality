@@ -42,7 +42,7 @@ def overlay_image_alpha(img, img_overlay, pos, alpha_mask):
 def get_fretborad():
     
     # Measurement in mm
-    fb_scale = 1.75
+    fb_scale = 1.0
     fb_h = 42.0
     # fb_w = 323.85 # 12th fret
     fb_w = 465.945 # 21st fret

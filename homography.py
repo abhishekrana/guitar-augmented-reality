@@ -15,15 +15,15 @@ OpenCV:
 """
 
 # image_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
- 
-if __name__ == '__main__' :
 
+
+def get_warped_image(im_template, im_dst, template_coords):
     output_dir = 'output'
+
  
     # Read source image.
     # im_template = cv2.imread('data/template/template_1.png')
     im_template = get_fretborad()
-    pu.db
     h_template, w_template, c_template = im_template.shape
     pts_src = np.array([[0, 0], [w_template, 0], [w_template, h_template],[0, h_template]])
     for ps in pts_src:
@@ -32,10 +32,10 @@ if __name__ == '__main__' :
     # cv2.imshow("Source Image", im_template)
 
 
-
-    im_dst = cv2.imread('data/guitar/test/2019-05-28-085835_1.jpg')
+    # im_dst = cv2.imread('data/guitar/test/2019-05-28-085835_1.jpg')
     # pts_dst = np.array([[427, 157], [1014, 90], [1025, 136], [420, 218]])
-    pts_dst = np.array([[437, 154], [1014, 90], [1025, 136], [435, 216]])
+    # pts_dst = np.array([[437, 154], [1014, 90], [1025, 136], [435, 216]])
+    pts_dst = np.array(template_coords)
     for ps in pts_dst:
         cv2.circle(im_dst, center=(ps[0], ps[1]), radius=1, color=(0,255,0), thickness=2)
     cv2.imwrite(os.path.join(output_dir, 'img_dst.jpg'), im_dst)
@@ -56,12 +56,40 @@ if __name__ == '__main__' :
     # im_overlay = cv2.addWeighted(src1=im_template, alpha=1, src2=im_dst, beta=1, gamma=0, dst=im_dst)
     # im_overlay = cv2.addWeighted(src1=im_warp, alpha=1, src2=im_dst, beta=0.5, gamma=0, dst=im_dst)
 
+    return im_warp
 
-    overlay_image_alpha(im_dst,
-                    im_warp[:, :, 0:3],
-                    (0, 0),
-                    im_warp[:, :, 3]/10)
-    cv2.imwrite(os.path.join(output_dir, 'img_overlay_dst.jpg'), im_dst)
+
+
+
+if __name__ == '__main__' :
+
+    output_dir = 'output'
+
+    im_template = get_fretborad()
+
+    im_dsts = [
+            'data/guitar/test/2019-05-28-085835_1.jpg',
+            'data/guitar/test/2019-05-28-085835_2.jpg',
+            'data/guitar/test/2019-05-28-085835_5.jpg',
+            'data/guitar/test/2019-05-28-085835_6.jpg',
+            ]
+
+    template_coords_list = [
+            [[437, 154], [1014, 90], [1025, 136], [435, 216]],
+            [[448, 162], [1051, 170], [1057, 226], [441, 230]],
+            [[444, 151], [1014, 62], [1029, 103], [440, 209]],
+            [[438, 149], [1040, 104], [1050, 157], [438, 220]]
+            ]
+
+    for idx, im_dst_path in enumerate(im_dsts):
+        im_dst_name = os.path.basename(im_dst_path)
+        im_dst = cv2.imread(im_dst_path)
+
+        template_coords = template_coords_list[idx]
+        im_warp = get_warped_image(im_template, im_dst, template_coords)
+        overlay_image_alpha(im_dst, im_warp[:, :, 0:3], (0, 0), im_warp[:, :, 3]/10)
+        cv2.imwrite(os.path.join(output_dir, im_dst_name + '_overlay_jpg'), im_dst)
+
 
 
     # cv2.imwrite(os.path.join(output_dir, 'img_overlay.jpg'), im_overlay)
@@ -74,5 +102,5 @@ if __name__ == '__main__' :
     #         (0, 0, 255), -1)
 
 
-    cv2.waitKey(0)
+    # cv2.waitKey(0)
 
