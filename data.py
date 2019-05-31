@@ -61,7 +61,7 @@ def adjustData(img,mask,flag_multi_class,num_class):
 def trainGenerator(batch_size,train_path,image_folder,mask_folder,aug_dict,image_color_mode = "grayscale",
                     mask_color_mode = "grayscale",image_save_prefix  = "image",mask_save_prefix  = "mask",
                     flag_multi_class = False,num_class = 2,save_to_dir = None,target_size = (256,256),seed = 1,
-                    class_mode=None
+                    class_mode=None, shuffle=False
                     ):
     '''
     can generate image and mask at the same time
@@ -81,9 +81,9 @@ def trainGenerator(batch_size,train_path,image_folder,mask_folder,aug_dict,image
         batch_size = batch_size,
         save_to_dir = save_to_dir,
         save_prefix = image_save_prefix,
-        seed = seed
+        seed = seed,
+        shuffle = shuffle
         )
-        # shuffle = True
     mask_generator = mask_datagen.flow_from_directory(
         train_path,
         classes = [mask_folder],
@@ -93,7 +93,8 @@ def trainGenerator(batch_size,train_path,image_folder,mask_folder,aug_dict,image
         batch_size = batch_size,
         save_to_dir = save_to_dir,
         save_prefix  = mask_save_prefix,
-        seed = seed
+        seed = seed,
+        shuffle = shuffle
         )
     train_generator = zip(image_generator, mask_generator)
     for (img,mask) in train_generator:

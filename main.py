@@ -16,6 +16,7 @@ from fretboard import  overlay_image_alpha, get_fretborad
 
 
 if __name__ == '__main__':
+    os.environ["CUDA_VISIBLE_DEVICES"]="1"
 
     logging.debug('K.image_data_format {}'.format(K.image_data_format()))
 
@@ -39,10 +40,14 @@ if __name__ == '__main__':
 
     fileHandler, consoleHandler = logger_init(output_dir, logging.DEBUG)
 
-    train_data_dir = 'data/guitar/train_1'
     # train_data_dir = 'data/guitar/train'
     # test_data_dir = 'data/guitar/test'
-    test_data_dir = 'data/guitar/test_2'
+
+    # train_data_dir = 'data/guitar/train_1'
+    # test_data_dir = 'data/guitar/test_2'
+
+    train_data_dir = 'data/guitar/dataset_frames1_train'
+    val_data_dir = 'data/guitar/dataset_frames1_val'
 
     # os.environ["CUDA_VISIBLE_DEVICES"] = "0"
     data_gen_args = dict(
@@ -54,25 +59,20 @@ if __name__ == '__main__':
                         # horizontal_flip=False,
                         fill_mode='nearest'
                         )
-    # data_gen_args = {}
+    data_gen_args = {}
     save_to_dir = os.path.join(output_dir, 'aug')
 
     flag_multi_class = False
     num_channels = 3
     # batch_size = 2
     batch_size = 1
-    epochs = 200
+    epochs = 100
     # target_size = (256, 256)
     # target_size = (420, 1280)
-    target_size = (416, 1280)
+    # target_size = (416, 1280)
+    target_size = (720, 1280)
     num_classes = 2
-    model_checkpoint = ModelCheckpoint(
-            os.path.join(checkpoint_dir, 'model_weights.hdf5'),
-            # monitor='loss',
-            monitor=None,
-            verbose=1,
-            save_best_only=True)
-
+    
     if save_to_dir:
         os.makedirs(save_to_dir, exist_ok=True)
 
@@ -80,10 +80,11 @@ if __name__ == '__main__':
     image_ext = '.jpg'
     train_images_list = glob.glob(os.path.join(train_data_dir, class_name, 'image', '*' + image_ext))
     num_train_images = len(train_images_list)
-    test_images_list = glob.glob(os.path.join(test_data_dir, class_name, '*' + image_ext))
-    num_test_images = len(test_images_list)
+    image_ext = '.png'
+    val_images_list = glob.glob(os.path.join(val_data_dir, class_name, 'label', '*' + image_ext))
+    num_val_images = len(val_images_list)
     logging.debug('num_train_images {}'.format(num_train_images))
-    logging.debug('num_test_images {}'.format(num_test_images))
+    logging.debug('num_val_images {}'.format(num_val_images))
 
 
     ### Data Generators
@@ -97,11 +98,32 @@ if __name__ == '__main__':
             target_size=target_size,
             image_color_mode = 'rgb',
             mask_color_mode = 'grayscale',
-            flag_multi_class = flag_multi_class
+            flag_multi_class = flag_multi_class,
+            shuffle = True
             )
 
-    train_flag = True
-    test_flag = False
+    val_gen = trainGenerator(
+            batch_size,
+            val_data_dir,
+            'image',
+            'label',
+            aug_dict={},
+            save_to_dir=None,
+            target_size=target_size,
+            image_color_mode = 'rgb',
+            mask_color_mode = 'grayscale',
+            flag_multi_class = flag_multi_class,
+            shuffle = False
+            )
+
+
+
+    # train_flag = True
+    # test_flag = False
+
+    train_flag = False
+    test_flag = True
+
 
     if train_flag:
         ### Model
@@ -110,6 +132,13 @@ if __name__ == '__main__':
                 input_size=input_size,
                 num_classes = num_classes
                 )
+
+        model_checkpoint = ModelCheckpoint(
+            os.path.join(checkpoint_dir, 'model_weights.hdf5'),
+            # monitor='loss',
+            monitor='val_loss',
+            verbose=1,
+            save_best_only=True)
 
         ### Train
         # tensorboard_dir = os.path.join(output_dir, 'summary')
@@ -121,10 +150,10 @@ if __name__ == '__main__':
                 train_gen, 
                 steps_per_epoch=num_train_images//batch_size,
                 epochs=epochs,
-                callbacks=[model_checkpoint]
+                callbacks=[model_checkpoint],
                 # callbacks=[model_checkpoint, tensorboard_cb]
-                # validation_data=validation_generator,
-                # validation_steps=num_validation_samples // batch_size_val,
+                validation_data=val_gen,
+                validation_steps=num_val_images // batch_size,
                 )
         logging.debug('history {}'.format(history))
 
@@ -135,9 +164,16 @@ if __name__ == '__main__':
         # input_size = (img.shape)
         # input_size = (h-4, w, c)
 
+        test_data_dir = 'data/guitar/dataset_frames1_val/'
+        test_images_list = glob.glob(os.path.join(test_data_dir, class_name, 'image', '*' + '.jpg'))
+        num_test_images = len(test_images_list)
         input_size = (target_size[0], target_size[1], num_channels)
+        logging.debug('input_size {}'.format(input_size))
         model = UNet(
-               pretrained_weights='output1/checkpoints/model_weights.hdf5',
+               # pretrained_weights='output1/checkpoints/model_weights.hdf5',
+               # pretrained_weights='output_6_model1/checkpoints/model_weights.hdf5',
+               # pretrained_weights='output/checkpoints/model_weights.hdf5',
+               pretrained_weights='output_7_model2-val_acc_0.9928-val_loss_0.0493/checkpoints/model_weights.hdf5',
                input_size=input_size,
                num_classes = num_classes
                )

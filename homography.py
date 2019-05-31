@@ -64,21 +64,23 @@ def get_warped_image(im_template, im_dst, template_coords):
 if __name__ == '__main__' :
 
     output_dir = 'output'
+    os.makedirs(output_dir, exist_ok=True)
 
     im_template = get_fretborad()
-
     im_dsts = [
             'data/guitar/test/2019-05-28-085835_1.jpg',
             'data/guitar/test/2019-05-28-085835_2.jpg',
             'data/guitar/test/2019-05-28-085835_5.jpg',
             'data/guitar/test/2019-05-28-085835_6.jpg',
+            'data/guitar/test/final.jpg',
             ]
 
     template_coords_list = [
             [[437, 154], [1014, 90], [1025, 136], [435, 216]],
             [[448, 162], [1051, 170], [1057, 226], [441, 230]],
             [[444, 151], [1014, 62], [1029, 103], [440, 209]],
-            [[438, 149], [1040, 104], [1050, 157], [438, 220]]
+            [[438, 149], [1040, 104], [1050, 157], [438, 220]],
+            [[78, 364], [1228, 362], [1234, 484], [69, 490]]
             ]
 
     for idx, im_dst_path in enumerate(im_dsts):
