@@ -1,7 +1,12 @@
 # pip3 install pudb
+# pip3 install Augmentor
 
-rm -rf output/*
-python3 main.py
+
+# rm -rf output/*
+python3 data_aug_offline.py
+
+# rm -rf output/*
+# python3 main.py
 # cp -r data/guitar/dataset_frames1_train/* output/
 # cp -r data/guitar/test/* output/
 

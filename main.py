@@ -46,27 +46,36 @@ if __name__ == '__main__':
     # train_data_dir = 'data/guitar/train_1'
     # test_data_dir = 'data/guitar/test_2'
 
+    # train_data_dir = 'data/guitar/dataset_frames1_train_1'
+    # val_data_dir = 'data/guitar/dataset_frames1_val_1'
+
     train_data_dir = 'data/guitar/dataset_frames1_train'
     val_data_dir = 'data/guitar/dataset_frames1_val'
 
     # os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+
     data_gen_args = dict(
-                        rotation_range=0.2,
                         # width_shift_range=0.05,
                         # height_shift_range=0.05,
+                        # width_shift_range=0.0,
+                        # height_shift_range=0.0,
                         # shear_range=0.05,
-                        # zoom_range=0.05,
                         # horizontal_flip=False,
-                        fill_mode='nearest'
+                        rotation_range=90,
+                        zoom_range=0.5, # if you specify 0.3, then the range will be [0.7, 1.3], or between 70% (zoom in) and 130% (zoom out).
+                        # brightness_range=(1.0, 2.0), # BUG: don't use. brightness_range: Values less than 1.0 should darken the image (currently a BUG). Values larger than 1.0 brighten the image, e.g. [1.0, 1.5], where 1.0 has no effect on brightness.
+                        fill_mode='constant'
                         )
     data_gen_args = {}
     save_to_dir = os.path.join(output_dir, 'aug')
+    save_to_dir = None
 
     flag_multi_class = False
     num_channels = 3
     # batch_size = 2
     batch_size = 1
     epochs = 100
+    # epochs = 1
     # target_size = (256, 256)
     # target_size = (420, 1280)
     # target_size = (416, 1280)
@@ -107,7 +116,7 @@ if __name__ == '__main__':
             val_data_dir,
             'image',
             'label',
-            aug_dict={},
+            aug_dict=data_gen_args,
             save_to_dir=None,
             target_size=target_size,
             image_color_mode = 'rgb',
@@ -118,11 +127,11 @@ if __name__ == '__main__':
 
 
 
-    # train_flag = True
-    # test_flag = False
+    train_flag = True
+    test_flag = False
 
-    train_flag = False
-    test_flag = True
+    # train_flag = False
+    # test_flag = True
 
 
     if train_flag:
@@ -170,10 +179,12 @@ if __name__ == '__main__':
         input_size = (target_size[0], target_size[1], num_channels)
         logging.debug('input_size {}'.format(input_size))
         model = UNet(
+               pretrained_weights='output/checkpoints/model_weights.hdf5',
                # pretrained_weights='output1/checkpoints/model_weights.hdf5',
                # pretrained_weights='output_6_model1/checkpoints/model_weights.hdf5',
                # pretrained_weights='output/checkpoints/model_weights.hdf5',
-               pretrained_weights='output_7_model2-val_acc_0.9928-val_loss_0.0493/checkpoints/model_weights.hdf5',
+               # pretrained_weights='output_7_model2-val_acc_0.9928-val_loss_0.0493/checkpoints/model_weights.hdf5',
+               # pretrained_weights='output_8_wrong/checkpoints/model_weights.hdf5',
                input_size=input_size,
                num_classes = num_classes
                )
