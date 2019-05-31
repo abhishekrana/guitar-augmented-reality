@@ -16,16 +16,18 @@ from fretboard import  overlay_image_alpha, get_fretborad
 
 
 if __name__ == '__main__':
-    os.environ["CUDA_VISIBLE_DEVICES"]="1"
+
+    train_flag = True
+    test_flag = False
+    os.environ["CUDA_VISIBLE_DEVICES"]="0"
+
+    # train_flag = False
+    # test_flag = True
+    # os.environ["CUDA_VISIBLE_DEVICES"]="1"
 
     logging.debug('K.image_data_format {}'.format(K.image_data_format()))
 
     ### Configuration
-    # 0 = all messages are logged (default behavior)
-    # 1 = INFO messages are not printed
-    # 2 = INFO and WARNING messages are not printed
-    # 3 = INFO, WARNING, and ERROR messages are not printed
-    # os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1' 
     tf.logging.set_verbosity(tf.logging.ERROR)
     config = tf.ConfigProto()
     config.gpu_options.allow_growth = True  # dynamically grow the memory used on the GPU
@@ -52,8 +54,8 @@ if __name__ == '__main__':
     # train_data_dir = 'data/guitar/dataset_frames1_train'
     # val_data_dir = 'data/guitar/dataset_frames1_val'
 
-    train_data_dir = 'data/guitar/dataset_frames1_train_aug'
-    val_data_dir = 'data/guitar/dataset_frames1_val_aug'
+    train_data_dir = 'data/guitar/dataset_frames1_train_aug_v2'
+    val_data_dir = 'data/guitar/dataset_frames1_val_aug_v2'
 
 
     # os.environ["CUDA_VISIBLE_DEVICES"] = "0"
@@ -76,17 +78,21 @@ if __name__ == '__main__':
 
     flag_multi_class = False
     num_channels = 3
-    # batch_size = 2
-    batch_size = 8
+    batch_size = 2
+    # batch_size = 8
+    # batch_size = 1
     epochs = 100
     # epochs = 1
     # target_size = (256, 256)
     # target_size = (420, 1280)
     # target_size = (416, 1280)
 
-    # target_size = (720, 1280)
-    # target_size = (360, 640)
     target_size = (640, 640)
+    # target_size = (720, 1280)
+    # target_size = (480, 640)
+
+    # target_size = (360, 640)
+    # target_size = (64, 64)
     num_classes = 2
     
     if save_to_dir:
@@ -134,13 +140,7 @@ if __name__ == '__main__':
 
 
 
-    train_flag = True
-    test_flag = False
-
-    # train_flag = False
-    # test_flag = True
-
-
+    
     if train_flag:
         ### Model
         input_size = (target_size[0], target_size[1], num_channels)
@@ -162,15 +162,15 @@ if __name__ == '__main__':
         #         log_dir=tensorboard_dir, 
         #         write_graph=True)
 
+        num_train_images = 100
         history = model.fit_generator(
                 train_gen, 
-                # steps_per_epoch=num_train_images//batch_size,
-                steps_per_epoch=200,
+                steps_per_epoch=num_train_images//batch_size,
                 epochs=epochs,
                 callbacks=[model_checkpoint],
                 # callbacks=[model_checkpoint, tensorboard_cb]
                 validation_data=val_gen,
-                validation_steps=num_val_images // batch_size,
+                validation_steps=num_val_images//batch_size,
                 )
         logging.debug('history {}'.format(history))
 
@@ -181,8 +181,13 @@ if __name__ == '__main__':
         # input_size = (img.shape)
         # input_size = (h-4, w, c)
 
-        test_data_dir = 'data/guitar/dataset_frames1_val/'
+        output_dir_test = os.path.join(output_dir, 'test')
+        os.makedirs(output_dir_test)
+
+        # test_data_dir = 'data/guitar/dataset_frames1_val/'
+        test_data_dir = 'data/guitar/dataset_frames1_val_aug/'
         test_images_list = glob.glob(os.path.join(test_data_dir, class_name, 'image', '*' + '.jpg'))
+        test_images_list = test_images_list[0:50]
         num_test_images = len(test_images_list)
         input_size = (target_size[0], target_size[1], num_channels)
         logging.debug('input_size {}'.format(input_size))
@@ -194,6 +199,8 @@ if __name__ == '__main__':
                # pretrained_weights='output_7_model2-val_acc_0.9928-val_loss_0.0493/checkpoints/model_weights.hdf5',
                # pretrained_weights='output_8_wrong/checkpoints/model_weights.hdf5',
                # pretrained_weights='output_10_model3_aug/checkpoints/model_weights.hdf5',
+               # pretrained_weights=os.path.join(output_dir, 'checkpoints/model_weights.hdf5'),
+               pretrained_weights='output_10_aug/checkpoints/model_weights.hdf5', # Best, 640x640
                input_size=input_size,
                num_classes = num_classes
                )
@@ -216,7 +223,7 @@ if __name__ == '__main__':
                 verbose=1
                 )
         saveResult(
-                output_dir, 
+                output_dir_test, 
                 results,
                 test_gen_img_name,
                 flag_multi_class = flag_multi_class

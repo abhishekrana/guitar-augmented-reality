@@ -53,7 +53,7 @@ def adjustData(img,mask,flag_multi_class,num_class):
         img = img / 255
         # Hardcoding
         # mask = mask /255
-        print('mask', np.unique(mask, return_counts=True))
+        # print('mask', np.unique(mask, return_counts=True))
         mask[mask == 38.0] = 1
 
         # import sys
