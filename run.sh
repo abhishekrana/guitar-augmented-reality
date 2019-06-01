@@ -22,7 +22,10 @@
 
 
 # rm -rf output/*
-python3 main.py
+# python3 main.py
+
+rm -rf output/*
+python3 main2.py
 
 # cp -r data/guitar/dataset_frames1_train/* output/
 # cp -r data/guitar/test/* output/

@@ -10,11 +10,8 @@ import logging
 from utils import logger_init
 
 
-def find_corners(output_dir, image_path):
+def find_corners(output_dir_contour, img,image_name):
 
-    image_name = os.path.basename(image_path).split('.')[0]
-
-    img = cv2.imread(image_path ,0)
     ret,thresh = cv2.threshold(img,127,255,0)
     contours,hierarchy = cv2.findContours(thresh, 1, 1)
     cnt = contours[0]
@@ -80,14 +77,17 @@ def find_corners(output_dir, image_path):
 if __name__ == '__main__':
     # https://tlcguitargoods.com/en/howto-fret-calculator
     output_dir = 'output'
-    output_dir_contour = 'output'
+    output_dir_contour = os.path.join(output_dir, 'contours')
     os.makedirs(output_dir, exist_ok=True)
     os.makedirs(output_dir_contour, exist_ok=True)
     filehandler, consolehandler = logger_init(output_dir, logging.DEBUG)
 
 
     images_list = glob.glob(os.path.join(output_dir, 'test', '*' + '.png'))
+    pu.db
     for image_path in images_list:
-        corners = find_corners(output_dir_contour, image_path)
+        image_name = os.path.basename(image_path).split('.')[0]
+        img = cv2.imread(image_path ,0) # (640, 640)
+        corners = find_corners(output_dir_contour, img, image_name)
         logging.debug('corners {}'.format(corners))
 
