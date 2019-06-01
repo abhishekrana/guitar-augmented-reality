@@ -14,6 +14,17 @@ import random
 
 from utils import logger_init
 
+def create_circular_mask(h, w, center=None, radius=None):
+    if center is None: # use the middle of the image
+        center = [int(w/2), int(h/2)]
+    if radius is None: # use the smallest distance between the center and image walls
+        radius = min(center[0], center[1], w-center[0], h-center[1])
+
+    Y, X = np.ogrid[:h, :w]
+    dist_from_center = np.sqrt((X - center[0])**2 + (Y-center[1])**2)
+
+    mask = dist_from_center <= radius
+    return mask
 
 def save_augmented_images_and_masks(augmented_images_masks, output_dir_aug, mask_in=None, prefix=None):
     img_dir=os.path.join(output_dir_aug, 'image')
@@ -64,8 +75,8 @@ if __name__ == '__main__':
     # ds_mode = 'val'
 
     if ds_mode == 'train':
-        train_path = 'data/guitar/dataset_frames1_train'
-        # train_path = 'data/guitar/dataset_frames1_train_1'
+        # train_path = 'data/guitar/dataset_frames1_train'
+        train_path = 'data/guitar/dataset_frames1_train_1'
 
     if ds_mode == 'val':
         train_path = 'data/guitar/dataset_frames1_val'
@@ -132,7 +143,25 @@ if __name__ == '__main__':
             augmented_images_masks_2 = p2.sample(2)
 
         for idx, aum_2 in enumerate(augmented_images_masks_2):
-            save_augmented_images_and_masks(np.array([[aum_2]]), output_dir_aug2, mask, 
+
+            ### Occlusion simulation using black circle
+            h, w, c = np.array(aum_2).shape
+            radius = h/8
+            w_offset = random.randint(int(-w/8), int(w/2))
+            h_offset = random.randint(int(-h/8), int(h/2))
+            center = [int(w/2)+w_offset , int(h/2)+h_offset]
+            erase_mask = create_circular_mask(h, w, center=center, radius=radius)
+            aum_2 = np.array([[aum_2]])
+
+            aum_2_img = aum_2[0, 0, :, :, 0]
+            aum_2_img[erase_mask] = 0
+            aum_2_img = aum_2[0, 0, :, :, 1]
+            aum_2_img[erase_mask] = 0
+            aum_2_img = aum_2[0, 0, :, :, 2]
+            aum_2_img[erase_mask] = 0
+            # aum_2[~mask] = 0
+
+            save_augmented_images_and_masks(aum_2, output_dir_aug2, mask, 
                     prefix = os.path.basename(image_path).split('.')[0].split('img_')[1] + '_' + str(idx))
 
 

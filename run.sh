@@ -4,18 +4,20 @@
 
 ### DATA AUGMENTATION - OFFLINE ###
 ## Train
-# rm -rf output/*
+# rm -rf output/aug
+# rm -rf output/aug2
 # python3 data_aug_offline.py
-# mkdir -p data/guitar/dataset_frames1_train_aug_v3/
-# mv output/aug data/guitar/dataset_frames1_train_aug_v3/
-# mv output/aug2/* data/guitar/dataset_frames1_train_aug_v3/
+# mkdir -p data/guitar/dataset_frames1_train_aug_v4/
+# mv output/aug data/guitar/dataset_frames1_train_aug_v4/
+# mv output/aug2/* data/guitar/dataset_frames1_train_aug_v4/
 
 ## Val
-# rm -rf output/*
+# rm -rf output/aug
+# rm -rf output/aug2
 # python3 data_aug_offline.py
-# mkdir -p data/guitar/dataset_frames1_val_aug_v3/
-# mv output/aug data/guitar/dataset_frames1_val_aug_v3/
-# mv output/aug2/* data/guitar/dataset_frames1_val_aug_v3/
+# mkdir -p data/guitar/dataset_frames1_val_aug_v4/
+# mv output/aug data/guitar/dataset_frames1_val_aug_v4/
+# mv output/aug2/* data/guitar/dataset_frames1_val_aug_v4/
 
 
 

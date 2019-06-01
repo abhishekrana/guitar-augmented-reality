@@ -185,10 +185,10 @@ if __name__ == '__main__':
         # input_size = (h-4, w, c)
 
         output_dir_test = os.path.join(output_dir, 'test')
-        os.makedirs(output_dir_test)
+        os.makedirs(output_dir_test, exist_ok=True)
 
         # test_data_dir = 'data/guitar/dataset_frames1_val/'
-        test_data_dir = 'data/guitar/dataset_frames1_val_aug_v2/'
+        test_data_dir = 'data/guitar/dataset_frames1_val_aug_v3/'
         test_images_list = glob.glob(os.path.join(test_data_dir, class_name, 'image', '*' + '.jpg'))
         test_images_list = test_images_list[0:50]
         num_test_images = len(test_images_list)
@@ -202,8 +202,8 @@ if __name__ == '__main__':
                # pretrained_weights='output_7_model2-val_acc_0.9928-val_loss_0.0493/checkpoints/model_weights.hdf5',
                # pretrained_weights='output_8_wrong/checkpoints/model_weights.hdf5',
                # pretrained_weights='output_10_model3_aug/checkpoints/model_weights.hdf5',
-               # pretrained_weights=os.path.join(output_dir, 'checkpoints/model_weights.hdf5'),
-               pretrained_weights='output_10_aug/checkpoints/model_weights.hdf5', # Best, 640x640
+               pretrained_weights=os.path.join(output_dir, 'checkpoints/model_weights.hdf5'),
+               # pretrained_weights='output_10_aug/checkpoints/model_weights.hdf5', # Best, 640x640
                input_size=input_size,
                num_classes = num_classes
                )
