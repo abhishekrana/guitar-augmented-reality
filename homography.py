@@ -84,6 +84,7 @@ if __name__ == '__main__' :
             ]
 
     for idx, im_dst_path in enumerate(im_dsts):
+        pu.db
         im_dst_name = os.path.basename(im_dst_path)
         im_dst = cv2.imread(im_dst_path)
 

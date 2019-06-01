@@ -20,7 +20,8 @@ def testing(test_images_list):
     flag_multi_class = False
     num_classes = 2
     num_channels = 3
-    target_size = (640, 640)
+    target_size = (720, 1280)
+    # target_size = (640, 640)
     output_dir = 'output'
     batch_size = 1
 
@@ -44,6 +45,7 @@ def testing(test_images_list):
            num_classes = num_classes
            )
 
+    images = []
     pred_masks = []
     for img_path_name in test_images_list:
         image_name = os.path.basename(img_path_name)
@@ -72,6 +74,7 @@ def testing(test_images_list):
         # img = labelVisualize(num_classes,COLOR_DICT,pred_mask) if flag_multi_class else pred_mask[:,:,0]
         # io.imsave(os.path.join(output_dir_test, mask_name), img)
 
+        images.extend(img)
         pred_masks.extend(pred_mask)
         logging.debug('pred_mask {}'.format(pred_mask.shape))
 
@@ -82,13 +85,13 @@ def testing(test_images_list):
 
 if __name__ == '__main__':
 
-    # train_flag = True
-    # test_flag = False
-    # os.environ["CUDA_VISIBLE_DEVICES"]="0"
+    train_flag = True
+    test_flag = False
+    os.environ["CUDA_VISIBLE_DEVICES"]="0"
 
-    train_flag = False
-    test_flag = True
-    os.environ["CUDA_VISIBLE_DEVICES"]="1"
+    # train_flag = False
+    # test_flag = True
+    # os.environ["CUDA_VISIBLE_DEVICES"]="1"
 
     logging.debug('K.image_data_format {}'.format(K.image_data_format()))
 
@@ -100,7 +103,7 @@ if __name__ == '__main__':
     sess = tf.Session(config=config)
     set_session(sess)  # set this TensorFlow session as the default session for Keras
 
-    output_dir = 'output'
+    output_dir = 'output_train'
     checkpoint_dir = os.path.join(output_dir, 'checkpoints')
     os.makedirs(output_dir, exist_ok=True)
     os.makedirs(checkpoint_dir, exist_ok=True)
@@ -154,17 +157,17 @@ if __name__ == '__main__':
 
     flag_multi_class = False
     num_channels = 3
-    batch_size = 2
+    # batch_size = 2
     # batch_size = 8
-    # batch_size = 1
+    batch_size = 1
     epochs = 200
     # epochs = 1
     # target_size = (256, 256)
     # target_size = (420, 1280)
     # target_size = (416, 1280)
 
-    target_size = (640, 640)
-    # target_size = (720, 1280)
+    # target_size = (640, 640)
+    target_size = (720, 1280)
     # target_size = (480, 640)
 
     # target_size = (360, 640)

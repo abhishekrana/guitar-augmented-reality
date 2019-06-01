@@ -8,6 +8,7 @@ from keras.backend.tensorflow_backend import set_session
 import tensorflow as tf
 import numpy as np
 import keras
+import cv2
 
 from utils import logger_init
 from model import *
@@ -15,6 +16,7 @@ from data import *
 from fretboard import  overlay_image_alpha, get_fretborad
 from main import testing
 from fit_rectangle import find_corners
+from homography import get_warped_image, get_fretborad
 
 
 if __name__ == '__main__':
@@ -22,8 +24,6 @@ if __name__ == '__main__':
     output_dir = 'output'
     os.makedirs(output_dir, exist_ok=True)
     fileHandler, consoleHandler = logger_init(output_dir, logging.DEBUG)
-
-
     class_name = ''
 
     test_data_dir = 'data/guitar/dataset_frames1_val/'
@@ -32,16 +32,43 @@ if __name__ == '__main__':
     test_images_list = test_images_list[0:4]
 
 
-    pu.db
     ### UNet Prediction ###
     pred_masks = testing(test_images_list)
     logging.debug('pred_masks {}'.format(pred_masks.shape)) # (4, 640, 640, 1)
 
+
     ### Cornors ###
     output_dir_contour = os.path.join(output_dir, 'contours')
     os.makedirs(output_dir_contour, exist_ok=True)
+    corners_list = []
     for pred_idx, pred_mask in enumerate(pred_masks):
         image_name = os.path.basename(test_images_list[pred_idx]).split('.')[0]
-        corners = find_corners(output_dir_contour, np.squeeze((pred_mask*255).astype(np.uint8)), image_name)
-        logging.debug('corners {}'.format(corners))
+        corners_ret = find_corners(output_dir_contour, np.squeeze((pred_mask*255).astype(np.uint8)), image_name)
+        # TODO: Handle < 4 corners
+        if corners_ret is not None:
+            corners = [corners_ret[0][0], corners_ret[1][0], corners_ret[2][0], corners_ret[3][0]]
+            corners_list.append(corners)
+            logging.debug('corners {}'.format(corners))
+        else:
+            logging.error('corners_ret {}'.format(corners_ret))
+    
+    # corners = array([
+    #    [[567, 382]],
+    #    [[260, 412]],
+    #    [[262, 473]],
+    #    [[567, 428]]], dtype=int32)
+
+    ### Template Wrap ###
+    im_template = get_fretborad()
+
+    # TODO: Don't read again
+    for idx, im_dst_path in enumerate(test_images_list):
+        im_dst_name = os.path.basename(im_dst_path)
+        im_dst = cv2.imread(im_dst_path)
+
+        template_coords = corners_list[idx]
+        im_warp = get_warped_image(im_template, im_dst, template_coords)
+        overlay_image_alpha(im_dst, im_warp[:, :, 0:3], (0, 0), im_warp[:, :, 3]/10)
+        cv2.imwrite(os.path.join(output_dir, im_dst_name + '_overlay_jpg'), im_dst)
+
 
