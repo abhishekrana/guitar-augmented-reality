@@ -17,13 +17,13 @@ from fretboard import  overlay_image_alpha, get_fretborad
 
 if __name__ == '__main__':
 
-    train_flag = True
-    test_flag = False
-    os.environ["CUDA_VISIBLE_DEVICES"]="0"
+    # train_flag = True
+    # test_flag = False
+    # os.environ["CUDA_VISIBLE_DEVICES"]="0"
 
-    # train_flag = False
-    # test_flag = True
-    # os.environ["CUDA_VISIBLE_DEVICES"]="1"
+    train_flag = False
+    test_flag = True
+    os.environ["CUDA_VISIBLE_DEVICES"]="1"
 
     logging.debug('K.image_data_format {}'.format(K.image_data_format()))
 
@@ -57,8 +57,16 @@ if __name__ == '__main__':
     # train_data_dir = 'data/guitar/dataset_frames1_train_aug_v2'
     # val_data_dir = 'data/guitar/dataset_frames1_val_aug_v2'
 
-    train_data_dir = 'data/guitar/dataset_frames1_train_aug_v2'
-    val_data_dir = 'data/guitar/dataset_frames1_val_aug_v3'
+
+    # train_data_dir = 'data/guitar/dataset_frames1_train_aug_v2'
+    # val_data_dir = 'data/guitar/dataset_frames1_val_aug_v3'
+
+    # train_data_dir = 'data/guitar/dataset_frames1_train_aug_v3'
+    # val_data_dir = 'data/guitar/dataset_frames1_val_aug_v3'
+
+
+    train_data_dir = 'data/guitar/dataset_frames1_train_aug_v4'
+    val_data_dir = 'data/guitar/dataset_frames1_val_aug_v4'
 
 
     # os.environ["CUDA_VISIBLE_DEVICES"] = "0"
@@ -84,7 +92,7 @@ if __name__ == '__main__':
     batch_size = 2
     # batch_size = 8
     # batch_size = 1
-    epochs = 100
+    epochs = 200
     # epochs = 1
     # target_size = (256, 256)
     # target_size = (420, 1280)
