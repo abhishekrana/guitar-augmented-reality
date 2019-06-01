@@ -2,16 +2,24 @@
 # pip3 install Augmentor
 
 
-# rm -rf output/aug/*
+### DATA AUGMENTATION - OFFLINE ###
+## Train
+# rm -rf output/*
 # python3 data_aug_offline.py
-# mkdir -p data/guitar/dataset_frames1_train_aug_v2/
-# mv output/aug2/* data/guitar/dataset_frames1_train_aug_v2/
-# mkdir -p data/guitar/dataset_frames1_val_aug_v2/
-# mv output/aug2/* data/guitar/dataset_frames1_val_aug_v2/
+# mkdir -p data/guitar/dataset_frames1_train_aug_v3/
+# mv output/aug data/guitar/dataset_frames1_train_aug_v3/
+# mv output/aug2/* data/guitar/dataset_frames1_train_aug_v3/
+
+## Val
+# rm -rf output/*
+# python3 data_aug_offline.py
+# mkdir -p data/guitar/dataset_frames1_val_aug_v3/
+# mv output/aug data/guitar/dataset_frames1_val_aug_v3/
+# mv output/aug2/* data/guitar/dataset_frames1_val_aug_v3/
 
 
 
-rm -rf output/*
+# rm -rf output/*
 python3 main.py
 
 # cp -r data/guitar/dataset_frames1_train/* output/

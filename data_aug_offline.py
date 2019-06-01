@@ -60,9 +60,16 @@ if __name__ == '__main__':
 
     filehandler, consolehandler = logger_init(output_dir, logging.DEBUG)
 
-    train_path = 'data/guitar/dataset_frames1_train_1'
-    # train_path = 'data/guitar/dataset_frames1_train'
-    # train_path = 'data/guitar/dataset_frames1_val'
+    ds_mode = 'train'
+    # ds_mode = 'val'
+
+    if ds_mode == 'train':
+        train_path = 'data/guitar/dataset_frames1_train'
+        # train_path = 'data/guitar/dataset_frames1_train_1'
+
+    if ds_mode == 'val':
+        train_path = 'data/guitar/dataset_frames1_val'
+
     image_folder = 'image'
     mask_folder = 'label'
 
@@ -82,18 +89,19 @@ if __name__ == '__main__':
     # p.zoom_random(1, percentage_area=0.5)
 
     ### Train
-    p.skew(0.25, magnitude=0.2) # To skew or tilt an image either left, right, forwards, or backwards and 8 cornors
-    p.rotate(0.25, max_left_rotation=15, max_right_rotation=15) # You could combine this with a resize operation, 
-    p.crop_random(0.25, percentage_area=0.7)
-    p.zoom_random(0.25, percentage_area=0.8)
-    augmented_images_masks, ys = p.sample(100)
+    if ds_mode == 'train':
+        p.skew(0.25, magnitude=0.2) # To skew or tilt an image either left, right, forwards, or backwards and 8 cornors
+        p.rotate(0.25, max_left_rotation=15, max_right_rotation=15) # You could combine this with a resize operation, 
+        p.crop_random(0.25, percentage_area=0.7)
+        p.zoom_random(0.25, percentage_area=0.8)
+        augmented_images_masks, ys = p.sample(200)
 
     ### Val
-    # p.rotate(0.25, max_left_rotation=10, max_right_rotation=10) # You could combine this with a resize operation, 
-    # p.crop_random(0.25, percentage_area=0.9)
-    # p.zoom_random(0.25, percentage_area=0.9)
-    # p.random_erasing(0.5, rectangle_area=0.5)
-    # augmented_images_masks, ys = p.sample(50)
+    if ds_mode == 'val':
+        p.rotate(0.25, max_left_rotation=10, max_right_rotation=10) # You could combine this with a resize operation, 
+        p.crop_random(0.25, percentage_area=0.9)
+        p.zoom_random(0.25, percentage_area=0.9)
+        augmented_images_masks, ys = p.sample(50)
 
     save_augmented_images_and_masks(augmented_images_masks, output_dir_aug)
 
@@ -110,16 +118,18 @@ if __name__ == '__main__':
         # p2.set_seed(seed)
 
         ### Train
-        ## p2.random_erasing(1.0, rectangle_area=0.9) # not working, TODO: fix
-        p2.random_brightness(0.5, min_factor=0.1, max_factor=2.0)
-        p2.random_contrast(0.5, min_factor=0.1, max_factor=2.0) # 1.0: original image
-        augmented_images_masks_2 = p2.sample(4)
+        if ds_mode == 'train':
+            # p2.random_erasing(1.0, rectangle_area=0.5) # not working, TODO: fix
+            p2.random_brightness(0.5, min_factor=0.1, max_factor=2.0)
+            p2.random_contrast(0.5, min_factor=0.1, max_factor=2.0) # 1.0: original image
+            augmented_images_masks_2 = p2.sample(4)
 
         ### Val
-        ## p2.random_erasing(1.0, rectangle_area=0.9) # not working, TODO: fix
-        # p2.random_brightness(0.5, min_factor=0.5, max_factor=1.5)
-        # p2.random_contrast(0.5, min_factor=0.5, max_factor=1.5) # 1.0: original image
-        # augmented_images_masks_2 = p2.sample(2)
+        if ds_mode == 'val':
+            ## p2.random_erasing(1.0, rectangle_area=0.9) # not working, TODO: fix
+            p2.random_brightness(0.5, min_factor=0.5, max_factor=1.5)
+            p2.random_contrast(0.5, min_factor=0.5, max_factor=1.5) # 1.0: original image
+            augmented_images_masks_2 = p2.sample(2)
 
         for idx, aum_2 in enumerate(augmented_images_masks_2):
             save_augmented_images_and_masks(np.array([[aum_2]]), output_dir_aug2, mask, 

@@ -54,8 +54,11 @@ if __name__ == '__main__':
     # train_data_dir = 'data/guitar/dataset_frames1_train'
     # val_data_dir = 'data/guitar/dataset_frames1_val'
 
+    # train_data_dir = 'data/guitar/dataset_frames1_train_aug_v2'
+    # val_data_dir = 'data/guitar/dataset_frames1_val_aug_v2'
+
     train_data_dir = 'data/guitar/dataset_frames1_train_aug_v2'
-    val_data_dir = 'data/guitar/dataset_frames1_val_aug_v2'
+    val_data_dir = 'data/guitar/dataset_frames1_val_aug_v3'
 
 
     # os.environ["CUDA_VISIBLE_DEVICES"] = "0"
@@ -185,7 +188,7 @@ if __name__ == '__main__':
         os.makedirs(output_dir_test)
 
         # test_data_dir = 'data/guitar/dataset_frames1_val/'
-        test_data_dir = 'data/guitar/dataset_frames1_val_aug/'
+        test_data_dir = 'data/guitar/dataset_frames1_val_aug_v2/'
         test_images_list = glob.glob(os.path.join(test_data_dir, class_name, 'image', '*' + '.jpg'))
         test_images_list = test_images_list[0:50]
         num_test_images = len(test_images_list)
