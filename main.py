@@ -17,6 +17,8 @@ from fretboard import  overlay_image_alpha, get_fretborad
 
 
 def testing(test_images_list):
+    os.environ["CUDA_VISIBLE_DEVICES"]="1"
+
     flag_multi_class = False
     num_classes = 2
     num_channels = 3
@@ -24,7 +26,6 @@ def testing(test_images_list):
     # target_size = (640, 640)
     output_dir = 'output'
     batch_size = 1
-
 
 
     output_dir_test = os.path.join(output_dir, 'test')
@@ -40,7 +41,8 @@ def testing(test_images_list):
     input_size = (target_size[0], target_size[1], num_channels)
     logging.debug('input_size {}'.format(input_size))
     model = UNet(
-           pretrained_weights = 'weights/model_weights/model_weights_640x640.hdf5',
+           # pretrained_weights = 'weights/model_weights/model_weights_640x640.hdf5',
+           pretrained_weights = 'weights/model_weights/model_weights_1280x720_v1.hdf5',
            input_size=input_size,
            num_classes = num_classes
            )

@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 import pudb
 from fretboard import  overlay_image_alpha, get_fretborad
+import logging
 
 """
 OpenCV: 
@@ -47,8 +48,15 @@ def get_warped_image(im_template, im_dst, template_coords):
     print('status', status)
      
     # Warp source image to destination based on homography
-    im_warp = cv2.warpPerspective(im_template, h, (im_dst.shape[1],im_dst.shape[0]))
-    cv2.imwrite(os.path.join(output_dir, 'img_template_warp.jpg'), im_warp)
+    try:
+        im_warp = cv2.warpPerspective(im_template, h, (im_dst.shape[1],im_dst.shape[0]))
+        cv2.imwrite(os.path.join(output_dir, 'img_template_warp.jpg'), im_warp)
+    except:
+        logging.error('im_template {}'.format(im_template))
+        logging.error('h {}'.format(h))
+        logging.error('im_dst {}'.format(im_dst.shape))
+        return None
+        # logging.error('im_warp {}'.format(im_warp))
     # cv2.imshow("Warped Source Image", im_warp)
      
 
@@ -82,9 +90,9 @@ if __name__ == '__main__' :
             [[438, 149], [1040, 104], [1050, 157], [438, 220]],
             [[78, 364], [1228, 362], [1234, 484], [69, 490]]
             ]
+            # [[1057, 226], [1051, 170], [448, 162], [441, 230]],
 
     for idx, im_dst_path in enumerate(im_dsts):
-        pu.db
         im_dst_name = os.path.basename(im_dst_path)
         im_dst = cv2.imread(im_dst_path)
 

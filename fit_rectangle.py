@@ -9,18 +9,72 @@ import cv2
 import logging
 from utils import logger_init
 
+def corners_arrange(corners, cx, cy):
+    # corners = np.array([[[ 492,  476]],
+    #        [[ 497,  566]],
+    #        [[1149,  583]],
+    #        [[1157,  535]]])
+    # cx = 804
+    # cy = 535
+
+    corners_l = []
+    corners_r = []
+    for v in corners:
+        x, y = v[0][0], v[0][1]
+        # print('x, y: {}, {}'.format(x, y))
+        if x < cx:
+            corners_l.append([x,y])
+        else:
+            corners_r.append([x,y])
+
+
+    try:
+        top_left = None
+        bottom_left = None
+        if corners_l[0][0] < corners_l[1][0]:
+            top_left = corners_l[0]
+            bottom_left = corners_l[1]
+        else:
+            top_left = corners_l[1]
+            bottom_left = corners_l[0]
+
+        top_right = None
+        bottom_right = None
+        if corners_r[0][1] < corners_r[1][1]:
+            top_right = corners_r[0]
+            bottom_right = corners_r[1]
+        else:
+            top_right = corners_r[1]
+            bottom_right = corners_r[0]
+    except:
+        logging.error('corners {}'.format(corners))
+        logging.error('cx {}'.format(cx))
+        logging.error('cy {}'.format(cy))
+        return None
+
+    corners_cw = [top_left, top_right, bottom_right, bottom_left]
+    print('corners_cw', corners_cw)
+    return corners_cw
+
+
 
 def find_corners(output_dir_contour, img,image_name):
+    # pu.db
 
     ret,thresh = cv2.threshold(img,127,255,0)
-    contours,hierarchy = cv2.findContours(thresh, 1, 1)
+    # contours,hierarchy = cv2.findContours(thresh, 1, 2)
+    contours, hierarchy = cv2.findContours(thresh.copy(),cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
     cnt = contours[0]
     M = cv2.moments(cnt)
     logging.debug('M {}'.format(M))
 
     # Centroids
+    if M['m00'] == 0:
+        return None
+
     cx = int(M['m10']/M['m00'])
     cy = int(M['m01']/M['m00'])
+    cv2.circle(img, center=(cx, cy), radius=5, color=(100, 100, 100), thickness=10)
 
     # area = cv2.contourArea(cnt)
     # perimeter = cv2.arcLength(cnt,True)
@@ -34,10 +88,11 @@ def find_corners(output_dir_contour, img,image_name):
     approx = cv2.approxPolyDP(cnt,epsilon,True)
     logging.debug('approx {}'.format(approx))
     for apx in approx:
-        cv2.circle(img, center=(apx[0][0], apx[0][1]), radius=1, color=(200, 200, 200), thickness=10)
+        cv2.circle(img, center=(apx[0][0], apx[0][1]), radius=4, color=(150, 150, 150), thickness=10)
 
     # Rotated rectangle
     rect = cv2.minAreaRect(cnt)
+    # Point center_of_rect = (r.br() + r.tl())*0.5;
     box = cv2.boxPoints(rect)
     box = np.int0(box)
     cv2.drawContours(img,[box],0,(127,127,255),2)
@@ -64,14 +119,17 @@ def find_corners(output_dir_contour, img,image_name):
         logging.debug('valid_corners {}'.format(valid_corners))
 
         for apx in valid_corners:
-            cv2.circle(img, center=(apx[0][0], apx[0][1]), radius=3, color=(250, 250, 250), thickness=15)
+            cv2.circle(img, center=(apx[0][0], apx[0][1]), radius=3, color=(200, 200, 200), thickness=10)
 
     else:
-        valid_corners = None
+        return None
+
+    # pu.db
+    valid_corners_arranged =  corners_arrange(valid_corners, cx, cy)
 
     cv2.imwrite(os.path.join(output_dir_contour, image_name + '_contour' + '.jpg'), img)
 
-    return valid_corners
+    return valid_corners_arranged
 
 
 if __name__ == '__main__':
@@ -84,7 +142,6 @@ if __name__ == '__main__':
 
 
     images_list = glob.glob(os.path.join(output_dir, 'test', '*' + '.png'))
-    pu.db
     for image_path in images_list:
         image_name = os.path.basename(image_path).split('.')[0]
         img = cv2.imread(image_path ,0) # (640, 640)

@@ -121,7 +121,6 @@ def trainGenerator2(batch_size,train_path,image_folder,mask_folder,aug_dict,imag
     img, mask = adjustData(img,mask,flag_multi_class,num_class)
     hash_str = str(random.getrandbits(16))
 
-    pu.db
     img_rgb = Image.fromarray((img * 255).astype(np.uint8))
     img_rgb.save(os.path.join('output', 'aug', 'img-' + hash_str + '.jpg'))
 
@@ -184,9 +183,7 @@ def trainGenerator(batch_size,train_path,image_folder,mask_folder,aug_dict,image
         )
     train_generator = zip(image_generator, mask_generator)
     for (img,mask) in train_generator:
-        # pu.db
         img,mask = adjustData(img,mask,flag_multi_class,num_class)
-        # pu.db
         yield (img,mask)
 
 
