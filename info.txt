@@ -1,0 +1,10 @@
+model_weights2: model_weights_1280x720_v1.hdf5
+
+Epoch 00061: val_loss did not improve from 0.02502
+Epoch 62/200
+100/100 [==============================] - 104s 1s/step - loss: 0.0348 - acc: 0.9960 - val_loss: 0.0246 - val_acc: 0.9978
+
+Epoch 00062: val_loss improved from 0.02502 to 0.02458, saving model to output_train/checkpoints/model_weights.hdf5
+Epoch 63/200
+100/100 [==============================] - 104s 1s/step - loss: 0.0347 - acc: 0.9963 - val_loss: 0.0252 - val_acc: 0.9979
+
