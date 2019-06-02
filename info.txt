@@ -8,3 +8,9 @@ Epoch 00062: val_loss improved from 0.02502 to 0.02458, saving model to output_t
 Epoch 63/200
 100/100 [==============================] - 104s 1s/step - loss: 0.0347 - acc: 0.9963 - val_loss: 0.0252 - val_acc: 0.9979
 
+
+
+$ docker run --runtime=nvidia --rm nvidia/cuda nvidia-smi
+docker: Error response from daemon: Unknown runtime specified nvidia.
+sudo systemctl daemon-reload
+sudo systemctl restart docker

@@ -12,7 +12,6 @@ import keras
 from utils import logger_init
 from model import *
 from data import *
-from fretboard import  overlay_image_alpha, get_fretborad
 
 
 
