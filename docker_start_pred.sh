@@ -2,7 +2,7 @@ REPO_NAME="aug-rel"
 REPO_VERSION="0.1"
 
 
-CONTAINER_NAME="${REPO_NAME//[\/]/_}"_"cnt_1"
+CONTAINER_NAME="${REPO_NAME//[\/]/_}"_"cnt_pred"
 PWD_NAME=` pwd | awk -F'/' '{print $NF}' `
 
 echo $CONTAINER_NAME

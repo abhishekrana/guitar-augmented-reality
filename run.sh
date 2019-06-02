@@ -1,5 +1,10 @@
-# pip3 install pudb
-# pip3 install Augmentor
+# apt update
+# apt-get install -y libsm6 libxext6 libxrender-dev
+# pip install opencv-python 
+# pip install scikit-image
+# pip install Augmentor
+# pip install pudb
+
 
 
 ### DATA AUGMENTATION - OFFLINE ###
@@ -28,7 +33,7 @@
 # python3 main.py
 
 rm -rf output/*
-python3 main2.py
+python3 main.py
 
 # cp -r data/guitar/dataset_frames1_train/* output/
 # cp -r data/guitar/test/* output/

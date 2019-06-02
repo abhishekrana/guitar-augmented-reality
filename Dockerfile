@@ -10,12 +10,9 @@ ENV PATH /opt/conda/bin:$PATH
 RUN apt-get update && apt-get install -y \
 	wget \
 	git \
-	exuberant-ctags \
 	sudo \
 	locate \
 	curl \
-	unzip \
-	tree \
 	python-pip \
 	python3-pip \
 	vim
@@ -41,17 +38,13 @@ RUN conda install -y \
 	tensorflow-gpu \
 	keras
 
-RUN conda install -y \
-	numpy \
-	rasterio \
-	geopandas \
-	fiona \
-	shapely \
-	matplotlib \
-	pandas \
-	scipy \
-	scikit-learn \
-	scikit-image
+# RUN conda install -y \
+# 	numpy \
+# 	matplotlib \
+# 	pandas \
+# 	scipy \
+# 	scikit-learn \
+# 	scikit-image
 
 RUN pip install \
 	pudb
