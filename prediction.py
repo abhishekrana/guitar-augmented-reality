@@ -24,6 +24,8 @@ from train import testing_load_model, testing_predict, testing_predict2
 from fit_rectangle import find_corners
 # from homography import get_warped_image
 
+DEBUG_FLAG = True
+
 def model_load(target_size, output_dir):
     num_classes = 2
     num_channels = 3
@@ -54,6 +56,8 @@ def prediction(model, test_images_list, target_size, batch_size, output_dir):
 
     for img_path_name in test_images_list:
         image_name = os.path.basename(img_path_name)
+        if not os.path.exists(img_path_name):
+            continue
         img = io.imread(img_path_name, as_gray=False)
         img = img / 255
         img = trans.resize(img,target_size)
@@ -71,7 +75,8 @@ def prediction(model, test_images_list, target_size, batch_size, output_dir):
 
         ## Save image
         mask_name = os.path.basename(img_path_name).split('.')[0] + '_predict.png'
-        io.imsave(os.path.join(output_dir_test, mask_name), np.squeeze((pred_mask*255).astype(np.uint8)))
+        if DEBUG_FLAG:
+            io.imsave(os.path.join(output_dir_test, mask_name), np.squeeze((pred_mask*255).astype(np.uint8)))
 
         images.extend(img)
         pred_masks.extend(pred_mask)
@@ -85,7 +90,8 @@ if __name__ == '__main__':
 
     output_dir = 'output'
     os.makedirs(output_dir, exist_ok=True)
-    fileHandler, consoleHandler = logger_init(output_dir, logging.DEBUG)
+    # fileHandler, consoleHandler = logger_init(output_dir, logging.DEBUG)
+    fileHandler, consoleHandler = logger_init(output_dir, logging.INFO)
     class_name = ''
     pred_corners_file = os.path.join(output_dir, 'pred_corners.pkl')
 
@@ -117,7 +123,7 @@ if __name__ == '__main__':
     images_processed_count = 0
     while(True):
         counter += 1
-        logging.debug('Processed [{}/{}]'.format(images_processed_count, counter))
+        logging.info('Processed [{}/{}]'.format(images_processed_count, counter))
 
         # if os.path.isfile(pred_corners_file):
         if not os.path.isfile(pred_image_file):
@@ -147,6 +153,8 @@ if __name__ == '__main__':
         if len(corners_list) != 0:
             images_processed_count += 1
             logging.debug('corners_list {}'.format(len(corners_list)))
+            while os.path.exists(pred_corners_file):
+                time.sleep(0.1)
             with open(pred_corners_file, 'wb') as fp:
                 pickle.dump(corners_list, fp)
         else:

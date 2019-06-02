@@ -21,12 +21,14 @@ from fretboard import FretBoard
 # from fit_rectangle import find_corners
 from homography import get_warped_image
 
+DEBUG_FLAG = False
 
 if __name__ == '__main__':
 
     output_dir = 'output'
     os.makedirs(output_dir, exist_ok=True)
-    fileHandler, consoleHandler = logger_init(output_dir, logging.DEBUG)
+    # fileHandler, consoleHandler = logger_init(output_dir, logging.DEBUG)
+    fileHandler, consoleHandler = logger_init(output_dir, logging.INFO)
     class_name = ''
     pred_corners_file = os.path.join(output_dir, 'pred_corners.pkl')
     pred_image_file = os.path.join(output_dir, 'pred_image.jpg')
@@ -41,8 +43,8 @@ if __name__ == '__main__':
     logging.debug('test_images_list {}'.format(test_images_list))
 
     # Create a VideoCapture object
-    # cap = cv2.VideoCapture(0)
-    cap = cv2.VideoCapture('data/guitar/videos/2019-06-02-225112.webm')
+    cap = cv2.VideoCapture(0)
+    # cap = cv2.VideoCapture('data/guitar/videos/2019-06-02-225112.webm')
      
     # Check if camera opened successfully
     if (cap.isOpened() == False): 
@@ -69,6 +71,9 @@ if __name__ == '__main__':
     # corners_list = [[[0,0], [0,0], [0,0], [0,0]]]
     corners_list = None
 
+    mask_path_name = 'output/test/pred_image_predict.png'
+    pred_image = None
+
     while(True):
         ret, frame = cap.read()
 
@@ -76,30 +81,29 @@ if __name__ == '__main__':
             frames_count += 1
             print('pred/frames: [{}/{}]'.format(pred_count, frames_count))
 
-            time.sleep(0.1)
+            # time.sleep(0.05)
+            time.sleep(0.01)
 
-            # if frames_count%10 != 0:
-            #     time.sleep(0.5)
-
-            # if frames_count%10 == 0:
-
-            #     ### UNet Prediction ###
-            #     pred_masks = testing_predict2(testing_model, test_images_list)
-            #     # pred_masks = testing_predict(testing_model, [frame])
-            #     logging.debug('pred_masks {}'.format(pred_masks.shape)) # (4, 640, 640, 1)
-            #     # break
 
             if not os.path.isfile(pred_image_file):
                 # Swap channels
                 io.imsave(pred_image_file, (frame[...,::-1]).astype(np.uint8))
-                # logging.debug('Saving image pred_image_file {}'.format(pred_image_file))
                 print('Saving image pred_image_file {}'.format(pred_image_file))
 
 
             if os.path.isfile(pred_corners_file):
-                with open(pred_corners_file, 'rb') as f:
-                    corners_list = pickle.load(f)
-                    # logging.debug('corners_list {}'.format(corners_list))
+                try:
+                    with open(pred_corners_file, 'rb') as f:
+                        corners_list = pickle.load(f)
+                        # logging.debug('corners_list {}'.format(corners_list))
+                except:
+                    logging.error('Exception')
+                    os.remove(pred_corners_file)
+                    os.remove(pred_image_file)
+                    continue
+
+                if os.path.exists(mask_path_name):
+                    pred_image = cv2.imread(mask_path_name)
                 os.remove(pred_corners_file)
                 os.remove(pred_image_file)
                 pred_count += 1
@@ -109,12 +113,6 @@ if __name__ == '__main__':
 
                 fb = FretBoard(output_dir)
 
-                # num_frames = 50
-                # test_images_list = num_frames*[test_images_list]
-                # corners_list = num_frames*corners_list
-
-                # for idx, im_dst_path in enumerate(test_images_list):
-                # im_dst_name = os.path.basename(im_dst_path).split('.')[0]
                 im_dst_name = 'final_out.jpg'
 
                 # im_dst = cv2.imread(im_dst_path)
@@ -145,7 +143,9 @@ if __name__ == '__main__':
                 im_warp = get_warped_image(im_template_basic, im_dst, template_coords, notes_pos_basic)
                 if im_warp is not None:
                     fb.overlay_image_alpha(im_dst, im_warp[:, :, 0:3], (0, 0), im_warp[:, :, 3]/10)
-                    cv2.imwrite(os.path.join(output_dir, im_dst_name + '_' + str(frames_count) + '_overlay.jpg'), im_dst)
+
+                    if DEBUG_FLAG:
+                        cv2.imwrite(os.path.join(output_dir, im_dst_name + '_' + str(frames_count) + '_overlay.jpg'), im_dst)
 
 
 
@@ -155,8 +155,13 @@ if __name__ == '__main__':
             # Write the frame into the file 'output.avi'
             # out.write(frame)
 
+
+            
             # Display the resulting frame    
             cv2.imshow('frame',frame)
+
+            if pred_image is not None:
+                cv2.imshow('prediction', pred_image)
 
             # Press Q on keyboard to stop recording
             if cv2.waitKey(1) & 0xFF == ord('q'):

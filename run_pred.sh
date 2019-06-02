@@ -5,8 +5,7 @@
 # pip install Augmentor
 # pip install pudb
 
-
-
 rm -rf output/*
-# cp -r data/guitar/test_4/*.jpg output/frames_pred/
+# cp pred_image.jpg output/
+# cp pred_corners.pkl output/
 python3 prediction.py
