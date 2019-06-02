@@ -20,6 +20,9 @@
 # mv output/aug2/* data/guitar/dataset_frames1_val_aug_v4/
 
 
+### unset DISPLAY XAUTHORITY
+# python3 read_video.py
+# xvfb-run python3 read_video.py
 
 # rm -rf output/*
 # python3 main.py

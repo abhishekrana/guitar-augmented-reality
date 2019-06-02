@@ -15,17 +15,17 @@ from data import *
 
 
 
-def testing(test_images_list):
-    os.environ["CUDA_VISIBLE_DEVICES"]="1"
+def testing_load_model(test_images_list):
+    os.environ["CUDA_VISIBLE_DEVICES"]="0"
 
-    flag_multi_class = False
     num_classes = 2
     num_channels = 3
-    target_size = (720, 1280)
+    # target_size = (720, 1280)
     # target_size = (640, 640)
+    target_size = (480, 640)
+    # target_size = (64, 64)
     output_dir = 'output'
     batch_size = 1
-
 
     output_dir_test = os.path.join(output_dir, 'test')
     os.makedirs(output_dir_test, exist_ok=True)
@@ -35,16 +35,90 @@ def testing(test_images_list):
     # test_images_list = glob.glob(os.path.join(test_data_dir, class_name, 'image', '*' + '.jpg'))
     # test_images_list = test_images_list[0:100]
 
-    num_test_images = len(test_images_list)
-    logging.debug('num_test_images {}'.format(num_test_images))
     input_size = (target_size[0], target_size[1], num_channels)
     logging.debug('input_size {}'.format(input_size))
     model = UNet(
-           # pretrained_weights = 'weights/model_weights/model_weights_640x640.hdf5',
-           pretrained_weights = 'weights/model_weights/model_weights_1280x720_v1.hdf5',
+           pretrained_weights = 'weights/model_weights/model_weights_640x640.hdf5',
+           # pretrained_weights = 'weights/model_weights/model_weights_1280x720_v1.hdf5',
            input_size=input_size,
            num_classes = num_classes
            )
+
+    return model
+
+
+
+def testing_predict(model, frames):
+    flag_multi_class = False
+    target_size = (480, 640)
+    # target_size = (640, 640)
+    batch_size = 1
+    output_dir = 'output'
+    output_dir_test = os.path.join(output_dir, 'test')
+
+    # num_test_images = len(test_images_list)
+    num_test_images = 1
+    logging.debug('num_test_images {}'.format(num_test_images))
+
+    images = []
+    pred_masks = []
+    for img in frames:
+
+        # Swap channels
+        img = img[...,::-1] 
+
+        # image_name = os.path.basename(img_path_name)
+        # img = io.imread(img_path_name, as_gray=False)
+        # img = np.expand_dims(img, axis=0)
+        img = img / 255
+        img = trans.resize(img,target_size)
+
+        # TODO
+        # img = np.reshape(img,img.shape+(1,)) if (not flag_multi_class) else img
+        img = np.reshape(img,(1,)+img.shape)
+
+        # img_rgb = io.imread(img_path_name)
+        # img_rgb = trans.resize(img_rgb, target_size)
+        # io.imsave(os.path.join(output_dir_test, os.path.basename(img_path_name)), (img_rgb*255).astype(np.uint8))
+
+        
+        logging.debug('Prediction Starts')
+        pred_mask = model.predict(
+                img,
+                # batch_size=num_test_images,
+                batch_size=batch_size,
+                verbose=1
+                )
+        logging.debug('Prediction Ends')
+        # logging.debug('pred_mask {}'.format(pred_mask))
+
+        ## Save image
+        # pu.db
+        image_name = 'image_1.jpg'
+        io.imsave(os.path.join(output_dir_test, image_name), np.squeeze((img*255).astype(np.uint8)))
+
+        # mask_name = os.path.basename(img_path_name).split('.')[0] + '_predict.png'
+        mask_name = 'mask_1.jpg'
+        io.imsave(os.path.join(output_dir_test, mask_name), np.squeeze((pred_mask*255).astype(np.uint8)))
+        # img = labelVisualize(num_classes,COLOR_DICT,pred_mask) if flag_multi_class else pred_mask[:,:,0]
+        # io.imsave(os.path.join(output_dir_test, mask_name), img)
+
+        # images.extend(img)
+        pred_masks.extend(pred_mask)
+        logging.debug('pred_mask {}'.format(pred_mask.shape))
+
+    return np.array(pred_masks)
+
+
+def testing_predict2(model, test_images_list):
+    flag_multi_class = False
+    target_size = (480, 640)
+    batch_size = 1
+    output_dir = 'output'
+    output_dir_test = os.path.join(output_dir, 'test')
+
+    num_test_images = len(test_images_list)
+    logging.debug('num_test_images {}'.format(num_test_images))
 
     images = []
     pred_masks = []
@@ -86,12 +160,12 @@ def testing(test_images_list):
 
 if __name__ == '__main__':
 
-    train_flag = True
-    test_flag = False
+    # train_flag = True
+    # test_flag = False
     os.environ["CUDA_VISIBLE_DEVICES"]="0"
 
-    # train_flag = False
-    # test_flag = True
+    train_flag = False
+    test_flag = True
     # os.environ["CUDA_VISIBLE_DEVICES"]="1"
 
     logging.debug('K.image_data_format {}'.format(K.image_data_format()))
