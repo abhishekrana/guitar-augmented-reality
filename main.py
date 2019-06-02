@@ -6,6 +6,7 @@ import skimage.io as io
 import cv2
 import numpy as np
 import time
+import pickle
 
 # from keras import backend as K
 # from keras.backend.tensorflow_backend import set_session
@@ -17,7 +18,7 @@ from utils import logger_init
 # from data import *
 from fretboard import FretBoard
 # from train import testing_load_model, testing_predict, testing_predict2
-from fit_rectangle import find_corners
+# from fit_rectangle import find_corners
 from homography import get_warped_image
 
 
@@ -64,16 +65,18 @@ if __name__ == '__main__':
     # testing_model = testing_load_model(test_images_list)
 
     frames_count = 0
+    pred_count = 0
     # corners_list = [[[0,0], [0,0], [0,0], [0,0]]]
     corners_list = None
 
     while(True):
         ret, frame = cap.read()
-        print('ret', ret)
 
         if ret == True: 
             frames_count += 1
-            # time.sleep(0.1)
+            print('pred/frames: [{}/{}]'.format(pred_count, frames_count))
+
+            time.sleep(0.1)
 
             # if frames_count%10 != 0:
             #     time.sleep(0.5)
@@ -89,15 +92,17 @@ if __name__ == '__main__':
             if not os.path.isfile(pred_image_file):
                 # Swap channels
                 io.imsave(pred_image_file, (frame[...,::-1]).astype(np.uint8))
-                logging.debug('Saving image pred_image_file {}'.format(pred_image_file))
+                # logging.debug('Saving image pred_image_file {}'.format(pred_image_file))
+                print('Saving image pred_image_file {}'.format(pred_image_file))
 
 
             if os.path.isfile(pred_corners_file):
                 with open(pred_corners_file, 'rb') as f:
                     corners_list = pickle.load(f)
-                    logging.debug('corners_list {}'.format(corners_list))
+                    # logging.debug('corners_list {}'.format(corners_list))
                 os.remove(pred_corners_file)
                 os.remove(pred_image_file)
+                pred_count += 1
 
 
             if corners_list is not None:
@@ -110,6 +115,7 @@ if __name__ == '__main__':
 
                 # for idx, im_dst_path in enumerate(test_images_list):
                 # im_dst_name = os.path.basename(im_dst_path).split('.')[0]
+                im_dst_name = 'final_out.jpg'
 
                 # im_dst = cv2.imread(im_dst_path)
                 # TODO: swap channels

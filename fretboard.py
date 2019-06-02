@@ -238,7 +238,7 @@ class FretBoard():
             ('s6f11', (int((self.fb_fret_dict['f11'] + self.fb_fret_dict['f10'])/2), int(self.fb_string_dict['s6']))),
             ('s6f12', (int((self.fb_fret_dict['f12'] + self.fb_fret_dict['f11'])/2), int(self.fb_string_dict['s6']))),
             ])
-        logging.debug('fb_string_fret_dict {}'.format(self.fb_string_fret_dict))
+        # logging.debug('fb_string_fret_dict {}'.format(self.fb_string_fret_dict))
          
 
     def get_fretboard_overlay_basic(self):
@@ -280,7 +280,7 @@ class FretBoard():
 
         ### FretBoard
         x, y, w, h = int(0*self.fb_scale), int(0*self.fb_scale), int(self.fb_w*self.fb_scale), int(self.fb_h*self.fb_scale)
-        logging.debug('x,y,w,h: {} {} {} {}'.format(x, y, w, h))
+        # logging.debug('x,y,w,h: {} {} {} {}'.format(x, y, w, h))
         cv2.rectangle(img_overlay, (x, y), (x+w, y+h), (0, 200, 0), 0)  # A filled rectangle
         # alpha = 0.4
         # img_overlay = cv2.addWeighted(img_overlay, alpha, img_overlay, 1 - alpha, 0)
@@ -309,10 +309,10 @@ class FretBoard():
 
     
     def add_fretboard_overlay_notes(self, img_overlay, notes):
-        logging.debug('notes {}'.format(notes))
+        # logging.debug('notes {}'.format(notes))
         notes_pos = []
         for note in notes:
-            logging.debug('note {}'.format(note))
+            # logging.debug('note {}'.format(note))
             # logging.debug('string_fret_name {}'.format(string_fret_name))
             # logging.debug('string_pos {}'.format(string_pos))
             if note is not None:

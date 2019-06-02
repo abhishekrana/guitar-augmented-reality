@@ -32,7 +32,9 @@
 # rm -rf output/*
 # python3 main.py
 
-rm -rf output/*
+# rm -rf output/*.jpg
+# rm -rf output/*.avi
+# mkdir -p output/test
 python3 main.py
 
 # cp -r data/guitar/dataset_frames1_train/* output/

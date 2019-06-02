@@ -3,6 +3,7 @@ import pudb
 import glob
 import logging
 import skimage.io as io
+import skimage.transform as trans
 from keras import backend as K
 from keras.backend.tensorflow_backend import set_session
 import tensorflow as tf

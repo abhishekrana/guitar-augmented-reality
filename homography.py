@@ -39,16 +39,18 @@ def get_warped_image(im_template, im_dst, template_coords, notes_pos):
     # pts_dst = np.array([[427, 157], [1014, 90], [1025, 136], [420, 218]])
     # pts_dst = np.array([[437, 154], [1014, 90], [1025, 136], [435, 216]])
     pts_dst = np.array(template_coords)
+    # pu.db
     for ps in pts_dst:
-        cv2.circle(im_dst, center=(ps[0], ps[1]), radius=1, color=(0,255,0), thickness=2)
+        # cv2.circle(im_dst, center=(ps[0], ps[1]), radius=1, color=(0,255,0), thickness=2)
+        cv2.circle(im_dst, center=(ps[0][0], ps[0][1]), radius=1, color=(0,255,0), thickness=2)
     cv2.imwrite(os.path.join(output_dir, 'img_dst.jpg'), im_dst)
     # cv2.imshow("Destination Image", im_dst)
 
     # Calculate Homography
     # M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC,5.0)
     H, status = cv2.findHomography(pts_src, pts_dst)
-    print('H', H)
-    print('status', status)
+    # print('H', H)
+    # print('status', status)
 
     # notes_pos = np.array([[0.0, 0.0], [455.0, 0.0], [455.0, 40.0], [0.0, 40.0]]).reshape(-1, 1, 2)
     if notes_pos is not None:

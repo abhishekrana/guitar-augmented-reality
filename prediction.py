@@ -3,10 +3,12 @@ import pudb
 import glob
 import logging
 import skimage.io as io
+import skimage.transform as trans
 import cv2
 import numpy as np
 import time
 import shutil
+import pickle
 
 from keras import backend as K
 from keras.backend.tensorflow_backend import set_session
@@ -14,11 +16,12 @@ import tensorflow as tf
 import keras
 
 from utils import logger_init
-from model import *
+from model import UNet
+# from model import *
 # from data import *
 # from fretboard import FretBoard
 from train import testing_load_model, testing_predict, testing_predict2
-# from fit_rectangle import find_corners
+from fit_rectangle import find_corners
 # from homography import get_warped_image
 
 def model_load(target_size, output_dir):
@@ -30,9 +33,9 @@ def model_load(target_size, output_dir):
     input_size = (target_size[0], target_size[1], num_channels)
     logging.debug('input_size {}'.format(input_size))
     model = UNet(
-           pretrained_weights = '/media/abhishek/OS1/Abhishek/gar2/model_weights/model_weights_640x640.hdf5',
+           # pretrained_weights = '/media/abhishek/OS1/Abhishek/gar2/model_weights/model_weights_640x640.hdf5',
            # pretrained_weights = '/media/abhishek/OS1/Abhishek/gar2/model_weights/model_weights_1280x720_v1.hdf5',
-           # pretrained_weights = 'weights/model_weights/model_weights_640x640.hdf5',
+           pretrained_weights = 'weights/model_weights/model_weights_640x640.hdf5',
            # pretrained_weights = 'weights/model_weights/model_weights_1280x720_v1.hdf5',
            input_size=input_size,
            num_classes = num_classes
@@ -43,7 +46,6 @@ def model_load(target_size, output_dir):
 
 def prediction(model, test_images_list, target_size, batch_size, output_dir):
 
-    batch_size = 1
     output_dir_test = os.path.join(output_dir, 'test')
 
     num_test_images = len(test_images_list)
@@ -57,9 +59,9 @@ def prediction(model, test_images_list, target_size, batch_size, output_dir):
         img = trans.resize(img,target_size)
         img = np.reshape(img,(1,)+img.shape)
 
-        img_rgb = io.imread(img_path_name)
-        img_rgb = trans.resize(img_rgb, target_size)
-        io.imsave(os.path.join(output_dir_test, os.path.basename(img_path_name)), (img_rgb*255).astype(np.uint8))
+        # img_rgb = io.imread(img_path_name)
+        # img_rgb = trans.resize(img_rgb, target_size)
+        # io.imsave(os.path.join(output_dir_test, os.path.basename(img_path_name)), (img_rgb*255).astype(np.uint8))
 
         pred_mask = model.predict(
                 img,
@@ -100,36 +102,33 @@ if __name__ == '__main__':
 
     # target_size = (720, 1280)
     # target_size = (640, 640)
-    # target_size = (480, 640)
-    target_size = (64, 64)
+    target_size = (480, 640)
+    # target_size = (64, 64)
+
+    batch_size = 1
 
 
     ### Load Model
-    testing_model = model_load(target_size, output_dir)
-    pred_image_file = [os.path.join(output_dir, 'pred_image.jpg')]
+    pred_model = model_load(target_size, output_dir)
+    pred_image_file = os.path.join(output_dir, 'pred_image.jpg')
+    test_images_list = [pred_image_file]
 
+    counter = 0
     images_processed_count = 0
     while(True):
-        images_processed_count += 1
-        logging.debug('images_processed_count {}'.format(images_processed_count))
+        counter += 1
+        logging.debug('Processed [{}/{}]'.format(images_processed_count, counter))
 
         # if os.path.isfile(pred_corners_file):
         if not os.path.isfile(pred_image_file):
-            logging.debug('No pred_image_file {}'.format(pred_image_file))
+            # logging.debug('No pred_image_file {}'.format(pred_image_file))
             time.sleep(0.5)
             continue
 
-        # test_images_list = glob.glob(os.path.join(pred_dir, '*' + '.jpg'))
-        test_images_list = [pred_corners_file]
-
-        if frames_count%10 == 0:
-            # time.sleep(0.1)
-
-            ### UNet Prediction ###
-            # pred_masks = testing_predict2(testing_model, test_images_list)
-            pred_masks = prediction(model, test_images_list, target_size, batch_size, output_dir)
-            # pred_masks = prediction(testing_model, test_images_list)
-            logging.debug('pred_masks {}'.format(pred_masks.shape)) # (4, 640, 640, 1)
+        ### UNet Prediction ###
+        # pred_masks = testing_predict2(pred_model, test_images_list)
+        pred_masks = prediction(pred_model, test_images_list, target_size, batch_size, output_dir)
+        logging.debug('pred_masks {}'.format(pred_masks.shape)) # (4, 640, 640, 1)
 
         # shutil.rmtree(pred_dir)
 
@@ -146,9 +145,13 @@ if __name__ == '__main__':
                 logging.debug('corners {}'.format(corners))
 
         if len(corners_list) != 0:
+            images_processed_count += 1
             logging.debug('corners_list {}'.format(len(corners_list)))
             with open(pred_corners_file, 'wb') as fp:
                 pickle.dump(corners_list, fp)
+        else:
+            if os.path.isfile(pred_image_file):
+                os.remove(pred_image_file)
         
 
 

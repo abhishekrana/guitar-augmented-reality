@@ -64,6 +64,9 @@ def find_corners(output_dir_contour, img,image_name):
     ret,thresh = cv2.threshold(img,127,255,0)
     # contours,hierarchy = cv2.findContours(thresh, 1, 2)
     contours, hierarchy = cv2.findContours(thresh.copy(),cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
+    if len(contours) == 0:
+        return None
+
     cnt = contours[0]
     M = cv2.moments(cnt)
     logging.debug('M {}'.format(M))

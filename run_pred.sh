@@ -7,6 +7,6 @@
 
 
 
-rm -rf output/frames_pred/*
+rm -rf output/*
 # cp -r data/guitar/test_4/*.jpg output/frames_pred/
 python3 prediction.py
