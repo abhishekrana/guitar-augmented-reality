@@ -43,9 +43,10 @@ if __name__ == '__main__':
     logging.debug('test_images_list {}'.format(test_images_list))
 
     # Create a VideoCapture object
-    cap = cv2.VideoCapture(0)
+    # cap = cv2.VideoCapture(0)
     # cap = cv2.VideoCapture('data/guitar/videos/2019-06-02-225112.webm')
-     
+    cap = cv2.VideoCapture('data/guitar/videos/2019-06-03-015949.webm')
+
     # Check if camera opened successfully
     if (cap.isOpened() == False): 
       print("Unable to read camera feed")
@@ -82,7 +83,8 @@ if __name__ == '__main__':
             print('pred/frames: [{}/{}]'.format(pred_count, frames_count))
 
             # time.sleep(0.05)
-            time.sleep(0.01)
+            # time.sleep(0.01)
+            time.sleep(0.005)
 
 
             if not os.path.isfile(pred_image_file):
@@ -97,7 +99,7 @@ if __name__ == '__main__':
                         corners_list = pickle.load(f)
                         # logging.debug('corners_list {}'.format(corners_list))
                 except:
-                    logging.error('Exception')
+                    # logging.error('Exception')
                     os.remove(pred_corners_file)
                     os.remove(pred_image_file)
                     continue

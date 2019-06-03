@@ -260,9 +260,9 @@ class FretBoard():
             x1, y1, x2, y2 = int(0*self.fb_scale), int(string_height*self.fb_scale), int(self.fb_w*self.fb_scale), int(string_height*self.fb_scale)
             cv2.line(img_overlay, (x1, y1), (x2, y2), (0,255,0), 1)
 
-        for fret_name, fret_width in self.fb_fret_dict.items():
-            x1, y1, x2, y2 = int(fret_width*self.fb_scale), int(0*self.fb_scale), int(fret_width*self.fb_scale), int(self.fb_h*self.fb_scale)
-            cv2.line(img_overlay, (x1, y1), (x2, y2), (0,255,0), 1)
+        # for fret_name, fret_width in self.fb_fret_dict.items():
+        #     x1, y1, x2, y2 = int(fret_width*self.fb_scale), int(0*self.fb_scale), int(fret_width*self.fb_scale), int(self.fb_h*self.fb_scale)
+        #     cv2.line(img_overlay, (x1, y1), (x2, y2), (0,255,0), 1)
 
         # cv2.flip(img_overlay, 1, img_overlay)
 
@@ -330,64 +330,155 @@ class FretBoard():
 
     def update_fretboard_overlay_got(self, img_overlay, progression_time):
 
-        if progression_time < len(self.progression) and self.progression[progression_time] is not None:
-            notes_pos = self.add_fretboard_overlay_notes(img_overlay, notes=self.progression[progression_time])
-            return notes_pos
-        else:
-            return None
 
-        # return img_overlay
+        if progression_time%10 == 0:
+            prog_time  = int(progression_time/10)
+            # print('progression_time', progression_time)
+            # print('prog_time', prog_time)
+
+            if prog_time < len(self.progression) and self.progression[prog_time] is not None:
+                notes_pos = self.add_fretboard_overlay_notes(img_overlay, notes=self.progression[prog_time])
+                # print('notes_pos', notes_pos)
+                return notes_pos
+            else:
+                return None
+
+        return None
 
 
     def tab_got(self):
         self.progression = [
-                [['s4f5']],
+                [['s4f1']],
                 [['s5f3']],
-
+                [['s4f1']],
+                [['s4f2']],
+                [['s4f1']],
+                [['s5f3']],
                 [['s4f1']],
                 [['s4f3']],
-                [['s4f5']],
-                [['s5f3']],
-
+                [['s4f1']],
+                [['s5f2']],
                 [['s4f1']],
                 [['s4f3']],
-                [['s4f5']],
+                [['s4f1']],
                 [['s5f3']],
-
                 [['s4f1']],
                 [['s4f3']],
-                [['s4f5']],
+                [['s4f1']],
                 [['s5f3']],
-
                 [['s4f1']],
                 [['s4f3']],
-                [['s4f5']],
-                [['s5f3']],
-
                 [['s4f1']],
-                [['s4f3']],
-                [['s4f5']],
                 [['s5f3']],
-
                 [['s4f2']],
                 [['s4f3']],
-                [['s4f5']],
+                [['s4f1']],
                 [['s5f3']],
-
                 [['s4f2']],
                 [['s4f3']],
-                [['s4f5']],
+                [['s4f1']],
                 [['s5f3']],
-
+                [['s4f2']],
+                [['s4f2']],
+                [['s4f1']],
+                [['s5f3']],
                 [['s4f2']],
                 [['s4f3']],
-                [['s4f5']],
-                [['s5f3']],
-
-                [['s4f2']],
+                [['s4f1']],
+                [['s2f1']],
+                [['s5f2']],
+                [['s3f3']],
+                [['s4f1']],
+                [['s2f3']],
                 [['s4f3']],
-                [['s4f5']],
-
+                [['s4f4']],
+                [['s5f2']],
+                [['s1f1']],
+                [['s4f3']],
+                [['s2f1']],
+                [['s5f3']],
+                [['s4f1']],
+                [['s1f2']],
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                # [['s5f1']],
+                # [['s5f3']],
+                # [['s2f1']],
+                # [['s4f3']],
+                # [['s5f1']],
+                # [['s5f3']],
+                # [['s4f1']],
+                # [['s4f3']],
+                # [['s2f4']],
+                # [['s5f3']],
+                # [['s4f1']],
+                # [['s1f3']],
+                # [['s4f1']],
+                # [['s5f3']],
+                # [['s5f1']],
+                # [['s4f4']],
+                # [['s4f1']],
+                # [['s5f3']],
+                # [['s1f1']],
+                # [['s4f3']],
+                # [['s4f1']],
+                # [['s1f3']],
+                # [['s4f4']],
+                # [['s5f3']],
+                # [['s4f1']],
+                # [['s5f3']],
+                # [['s4f1']],
+                # [['s4f3']],
+                # [['s4f4']],
+                # [['s2f3']],
+                # [['s4f1']],
+                # [['s5f3']],
+                # [['s4f1']],
+                # [['s5f3']],
+                # [['s1f1']],
+                # [['s4f4']],
+                # [['s4f1']],
+                # [['s5f3']],
+                # [['s1f1']],
+                # [['s4f3']],
+                # [['s4f4']],
+                # [['s5f3']],
                 ]
 
 

@@ -65,9 +65,12 @@ def get_warped_image(im_template, im_dst, template_coords, notes_pos):
         im_warp = cv2.warpPerspective(im_template, H, (im_dst.shape[1],im_dst.shape[0]))
         cv2.imwrite(os.path.join(output_dir, 'img_template_warp.jpg'), im_warp)
     except:
-        logging.error('im_template {}'.format(im_template))
-        logging.error('H {}'.format(H))
-        logging.error('im_dst {}'.format(im_dst.shape))
+        print('ERROR: im_template', im_template)
+        print('ERROR: H', H)
+        print('ERROR: im_dst', im_dst.shape)
+        # logging.error('im_template {}'.format(im_template))
+        # logging.error('H {}'.format(H))
+        # logging.error('im_dst {}'.format(im_dst.shape))
         return None
         # logging.error('im_warp {}'.format(im_warp))
     # cv2.imshow("Warped Source Image", im_warp)
